@@ -3,6 +3,8 @@ import json
 import subprocess
 import requests
 
+GITHUB_API_URL = "https://api.github.com"
+
 class GitHubActions:
     @staticmethod
     def push_branch(repo_path):
@@ -133,7 +135,7 @@ class GitHubActions:
             print(f"Unexpected error in {repo_path}: {e}")
 
     @staticmethod
-    def create_pull_request(repo_path, branch_name, pr_title, pr_description, github_token, github_api_url):
+    def create_pull_request(repo_path, branch_name, pr_title, pr_description, github_token):
         """
         Create a Pull Request using the GitHub API.
         """
@@ -155,7 +157,7 @@ class GitHubActions:
                 return
             
             # GitHub API endpoint for creating a PR
-            url = f"{github_api_url}/repos/{owner}/{repo}/pulls"
+            url = f"{GITHUB_API_URL}/repos/{owner}/{repo}/pulls"
             
             # PR payload
             payload = {

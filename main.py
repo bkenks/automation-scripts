@@ -15,6 +15,8 @@ class MainApp:
         """
         Prompt the user for the parent folder containing all repositories.
         """
+        os.system('clear')
+
         self.repo_path = input("Enter the path to the folder containing your Git repositories: ").strip()
         self.repo_path = os.path.abspath(self.repo_path)
         
@@ -27,8 +29,11 @@ class MainApp:
         """
         Bulk create and checkout branches in all repositories.
         """
+        os.system('clear')
+
         if not self.repo_path:
             print("Parent folder not set. Please set the parent folder first.")
+            input("\nPress Enter to go back to the menu...")
             return
         
         # Prompt the user for the new branch name
@@ -39,21 +44,25 @@ class MainApp:
         else:
             Formatting.print_separator()
             # Loop through all directories in the parent folder
-            for root, dirs, files in os.walk(repo_path):
+            for root, dirs, files in os.walk(self.repo_path):
                 for dir_name in dirs:
                     repo_path = os.path.join(root, dir_name)
-                    GitHubActions.create_and_switch_branch(self.repo_path, "main")
-                    GitHubActions.push_branch(self.repo_path)
+                    GitHubActions.create_and_switch_branch(repo_path, branch_name)
+                    GitHubActions.push_branch_set_upstream(repo_path)
+                    print("\n")
                 break  # Prevent walking into subdirectories
-
-        print("\n")
+        
+        input("Press Enter to go back to the menu...")
 
     def bulk_delete_branches(self):
         """
         Bulk delete branches in all repositories.
         """
+        os.system('clear')
+
         if not self.repo_path:
             print("Parent folder not set. Please set the parent folder first.")
+            input("\nPress Enter to go back to the menu...")
             return
         
         branch_name = input("Enter the name of the branch to delete: ").strip()
@@ -62,11 +71,14 @@ class MainApp:
             print("Branch name cannot be empty!")
         else:
             Formatting.print_separator()
-            for root, dirs, files in os.walk(repo_path):
+            for root, dirs, files in os.walk(self.repo_path):
                 for dir_name in dirs:
                     repo_path = os.path.join(root, dir_name)
                     GitHubActions.delete_local_and_remote_branch(repo_path, branch_name)
+                    print("\n")
                 break  # Prevent walking into subdirectories
+        
+        input("Press Enter to go back to the menu...")
         
         # Example: Call your utility function here
         # branch_name = input("Enter the name of the branch to delete: ").strip()
@@ -77,8 +89,11 @@ class MainApp:
         """
         Bulk copy a folder into all repositories.
         """
+        os.system('clear')
+
         if not self.repo_path:
             print("Parent folder not set. Please set the parent folder first.")
+            input("\nPress Enter to go back to the menu...")
             return
         
         # Prompt the user for the source folder path
@@ -100,7 +115,7 @@ class MainApp:
         Formatting.print_separator()
 
         # Loop through all directories in the parent folder
-        for root, dirs, files in os.walk(repo_path):
+        for root, dirs, files in os.walk(self.repo_path):
             for dir_name in dirs:
                 repo_path = os.path.join(root, dir_name)
                 try:
@@ -112,7 +127,9 @@ class MainApp:
                 except Exception as e:
                     print(f"Skipping {repo_path} due to errors.")
                     print(f"Error: {e}")
-            break # Prevent walking into subdirectories
+            break# Prevent walking into subdirectories
+
+        input("Press Enter to go back to the menu...")
 
         # Example: Call your utility function here
         # source_folder = input("Enter the path to the folder you want to copy: ").strip()
@@ -124,8 +141,11 @@ class MainApp:
         """
         Bulk create PRs for all repositories.
         """
+        os.system('clear')
+
         if not self.repo_path:
             print("Parent folder not set. Please set the parent folder first.")
+            input("\nPress Enter to go back to the menu...")
             return
         
         # Prompt the user for the branch name
@@ -154,7 +174,7 @@ class MainApp:
         Formatting.print_separator()
 
         # Loop through all directories in the parent folder
-        for root, dirs, files in os.walk(repo_path):
+        for root, dirs, files in os.walk(self.repo_path):
             for dir_name in dirs:
                 repo_path = os.path.join(root, dir_name)
                 try:
@@ -163,37 +183,44 @@ class MainApp:
                     
                     # Create the PR
                     GitHubActions.create_pull_request(repo_path, branch_name, pr_title, pr_description, github_token)
+
+                    print("\n")
                 except Exception as e:
-                    print(f"Skipping {repo_path} due to the following errors.")
+                    print(f"Skipping {self.repo_path} due to the following errors.")
                     print(f"Error: {e}")
                 print("\n")
             break  # Prevent walking into subdirectories
+
+        input("Press Enter to go back to the menu...")
         
         # Example: Call your utility function here
         # branch_name = input("Enter the name of the branch to create PRs for: ").strip()
         # pr_title = input("Enter the PR title: ").strip()
         # pr_description = input("Enter the PR description: ").strip()
         # self.utils.create_prs(self.repo_path, branch_name, pr_title, pr_description)
-        print("Bulk create PRs functionality goes here.")
+        # print("Bulk create PRs functionality goes here.")
 
-    def show_bulk_actions_menu(self):
+    def show_menu(self):
         """
-        Display the submenu for bulk GitHub actions.
+        Display the interactive menu and handle user input.
         """
-        bulk_options = [
+        options = [
+            "Set parent folder of repos (required for all actions)",
             "Bulk create and checkout branches",
             "Bulk delete branches",
             "Bulk copy folder into repositories",
             "Bulk create PRs",
-            "Return to main menu"
+            "Exit"
         ]
         
         while True:
-            # Display the submenu
-            selected_option, _ = pick(bulk_options, title="Select a bulk action:", indicator="=>")
+            # Display the menu
+            selected_option, _ = pick(options, title="Select an action:", indicator="=>")
             
             # Handle the selected option
-            if selected_option == "Bulk create and checkout branches":
+            if selected_option == "Set parent folder of repos (required for all actions)":
+                self.set_repo_path()
+            elif selected_option == "Bulk create and checkout branches":
                 self.bulk_create_and_checkout_branches()
             elif selected_option == "Bulk delete branches":
                 self.bulk_delete_branches()
@@ -201,28 +228,6 @@ class MainApp:
                 self.bulk_copy_folder()
             elif selected_option == "Bulk create PRs":
                 self.bulk_create_prs()
-            elif selected_option == "Return to main menu":
-                break
-
-    def show_menu(self):
-        """
-        Display the main interactive menu and handle user input.
-        """
-        main_options = [
-            "Set parent folder (required for all actions)",
-            "Bulk GitHub Actions",
-            "Exit"
-        ]
-        
-        while True:
-            # Display the main menu
-            selected_option, _ = pick(main_options, title="Select an action:", indicator="=>")
-            
-            # Handle the selected option
-            if selected_option == "Set parent folder (required for all actions)":
-                self.set_parent_folder()
-            elif selected_option == "Bulk GitHub Actions":
-                self.show_bulk_actions_menu()
             elif selected_option == "Exit":
                 print("Exiting the application. Goodbye!")
                 break
