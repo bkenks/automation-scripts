@@ -1,6 +1,6 @@
 import os
-from utils import FileEditing, GitHubActions, Formatting
 from pick import pick  # For interactive menu
+from utils import FileEditing, GitHubActions, Formatting
 
 class MainApp:
     def __init__(self):
