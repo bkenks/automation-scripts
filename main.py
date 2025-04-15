@@ -200,35 +200,54 @@ class MainApp:
         # self.utils.create_prs(self.repo_path, branch_name, pr_title, pr_description)
         # print("Bulk create PRs functionality goes here.")
 
-    def show_menu(self):
+    def show_bulk_actions_menu(self):
         """
-        Display the interactive menu and handle user input.
+        Display the bulk actions menu and handle user input.
         """
         options = [
-            "Set parent folder of repos (required for all actions)",
-            "Bulk create and checkout branches",
-            "Bulk delete branches",
-            "Bulk copy folder into repositories",
-            "Bulk create PRs",
-            "Exit"
+            "set parent folder of repos [required for all actions]",
+            "create then checkout branches",
+            "delete branches",
+            "copy folder into repositories",
+            "create PRs",
+            "back"
+        ]
+
+        while True:
+            # Display the bulk actions menu
+            selected_option, _ = pick(options, title="Select a bulk action:", indicator="=>")
+            
+            # Handle the selected option
+            if selected_option == "set parent folder of repos [required for all actions]":
+                self.set_repo_path()
+            elif selected_option == "create then checkout branches":
+                self.bulk_create_and_checkout_branches()
+            elif selected_option == "delete branches":
+                self.bulk_delete_branches()
+            elif selected_option == "copy folder into repositories":
+                self.bulk_copy_folder()
+            elif selected_option == "create PRs":
+                self.bulk_create_prs()
+            elif selected_option == "back":
+                break
+
+    def show_menu(self):
+        """
+        Display the main menu and handle user input.
+        """
+        options = [
+            "bulk actions",
+            "exit"
         ]
         
         while True:
-            # Display the menu
+            # Display the main menu
             selected_option, _ = pick(options, title="Select an action:", indicator="=>")
             
             # Handle the selected option
-            if selected_option == "Set parent folder of repos (required for all actions)":
-                self.set_repo_path()
-            elif selected_option == "Bulk create and checkout branches":
-                self.bulk_create_and_checkout_branches()
-            elif selected_option == "Bulk delete branches":
-                self.bulk_delete_branches()
-            elif selected_option == "Bulk copy folder into repositories":
-                self.bulk_copy_folder()
-            elif selected_option == "Bulk create PRs":
-                self.bulk_create_prs()
-            elif selected_option == "Exit":
+            if selected_option == "bulk actions":
+                self.show_bulk_actions_menu()
+            elif selected_option == "exit":
                 print("Exiting the application. Goodbye!")
                 break
 
